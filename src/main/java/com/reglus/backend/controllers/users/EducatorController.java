@@ -8,6 +8,7 @@ import com.reglus.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import java.util.List;
@@ -23,13 +24,16 @@ public class EducatorController {
     @Autowired
     private EducatorRepository educatorRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder; // Injeta o PasswordEncoder
+
     @PostMapping
     public ResponseEntity<?> createEducator(@RequestBody EducatorRequest educatorRequest) {
         try {
             User user = new User();
             user.setUserType(educatorRequest.getUserType());
             user.setEmail(educatorRequest.getEmail());
-            user.setPasswordHash(educatorRequest.getPasswordHash());
+            user.setPasswordHash(passwordEncoder.encode(educatorRequest.getPasswordHash())); // Criptografa a senha
             user.setName(educatorRequest.getName());
             user.setDateBirth(educatorRequest.getDateBirth());
             user.setGender(educatorRequest.getGender());

@@ -11,6 +11,7 @@ import com.reglus.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,13 +29,16 @@ public class StudentController {
     @Autowired
     private SocialAspectRepository socialAspectRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder; // Injeta o PasswordEncoder
+
     @PostMapping
     public ResponseEntity<?> createStudent(@RequestBody StudentRequest studentRequest) {
         try {
             User user = new User();
             user.setUserType(UserType.STUDENT);
             user.setEmail(studentRequest.getEmail());
-            user.setPasswordHash(studentRequest.getPasswordHash());
+            user.setPasswordHash(passwordEncoder.encode(studentRequest.getPasswordHash())); // Criptografa a senha
             user.setName(studentRequest.getName());
             user.setDateBirth(studentRequest.getDateBirth());
             user.setGender(studentRequest.getGender());
