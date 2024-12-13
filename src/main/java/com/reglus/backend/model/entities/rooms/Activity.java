@@ -1,5 +1,6 @@
 package com.reglus.backend.model.entities.rooms;
 
+import com.reglus.backend.model.entities.schedule.Schedule;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -37,7 +38,20 @@ public class Activity {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @ManyToOne
+    @JoinColumn(name = "schedule_id", nullable = false)
+    private Schedule schedule;
+
     // Getters and Setters
+
+    public Schedule getSchedule() {
+        return schedule;
+    }
+
+    public void setSchedule(Schedule schedule) {
+        this.schedule = schedule;
+    }
+
     public Long getActivityId() {
         return activityId;
     }
@@ -101,4 +115,6 @@ public class Activity {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+
 }
