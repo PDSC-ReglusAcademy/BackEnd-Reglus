@@ -1,84 +1,48 @@
 package com.reglus.backend.model.entities.schedule;
 
-import com.reglus.backend.model.entities.rooms.Activity;
-import com.reglus.backend.model.entities.users.Educator;
-import com.reglus.backend.model.entities.users.Student;
+import com.reglus.backend.model.entities.users.User;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "schedules") // ou "agendas"
+@Table(name = "schedules")
 public class Schedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "schedule_id")
-    private Long scheduleId;
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "student_id", nullable = false)
-    private Student student;
-
-    @ManyToOne
-    @JoinColumn(name = "educator_id", nullable = false)
-    private Educator educator;
-
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Activity> activities;
-
-    @Column(name = "description", length = 255)
     private String description;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDate date; // Novo campo para armazenar a data do agendamento
 
-    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Construtor
-    public Schedule() {
+    @ManyToOne
+    private User student;
+
+    @ManyToOne
+    private User educator;
+
+    @ManyToMany
+    @JoinTable(
+            name = "schedule_shared_users",
+            joinColumns = @JoinColumn(name = "schedule_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> sharedUsers = new HashSet<>();
+
+    // 🔹 Métodos Getters e Setters
+    public Long getId() {
+        return id;
     }
 
-    public Schedule(Student student, Educator educator, String description) {
-        this.student = student;
-        this.educator = educator;
-        this.description = description;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    // Getters e Setters
-    public Long getScheduleId() {
-        return scheduleId;
-    }
-
-    public void setScheduleId(Long scheduleId) {
-        this.scheduleId = scheduleId;
-    }
-
-    public Student getStudent() {
-        return student;
-    }
-
-    public void setStudent(Student student) {
-        this.student = student;
-    }
-
-    public Educator getEducator() {
-        return educator;
-    }
-
-    public void setEducator(Educator educator) {
-        this.educator = educator;
-    }
-
-    public List<Activity> getActivities() {
-        return activities;
-    }
-
-    public void setActivities(List<Activity> activities) {
-        this.activities = activities;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getDescription() {
@@ -87,6 +51,14 @@ public class Schedule {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -103,5 +75,33 @@ public class Schedule {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public User getStudent() {
+        return student;
+    }
+
+    public void setStudent(User student) {
+        this.student = student;
+    }
+
+    public User getEducator() {
+        return educator;
+    }
+
+    public void setEducator(User educator) {
+        this.educator = educator;
+    }
+
+    public Set<User> getSharedUsers() {
+        return sharedUsers;
+    }
+
+    public void setSharedUsers(Set<User> sharedUsers) {
+        this.sharedUsers = sharedUsers;
+    }
+
+    public void addSharedUsers(Set<User> users) {
+        this.sharedUsers.addAll(users);
     }
 }
