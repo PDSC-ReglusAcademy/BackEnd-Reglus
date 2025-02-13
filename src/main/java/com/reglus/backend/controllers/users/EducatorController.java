@@ -1,9 +1,11 @@
 package com.reglus.backend.controllers.users;
 
+import com.reglus.backend.model.entities.schedule.Schedule;
 import com.reglus.backend.model.entities.users.User;
 import com.reglus.backend.model.entities.users.Educator;
 import com.reglus.backend.model.entities.users.EducatorRequest;
 import com.reglus.backend.repositories.EducatorRepository;
+import com.reglus.backend.repositories.ScheduleRepository;
 import com.reglus.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +29,9 @@ public class EducatorController {
     private EducatorRepository educatorRepository;
 
     @Autowired
+    private ScheduleRepository scheduleRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder; // Injeta o PasswordEncoder
 
     @PostMapping
@@ -33,13 +40,15 @@ public class EducatorController {
             User user = new User();
             user.setUserType(educatorRequest.getUserType());
             user.setEmail(educatorRequest.getEmail());
-            user.setPasswordHash(passwordEncoder.encode(educatorRequest.getPasswordHash())); // Criptografa a senha
+            user.setPasswordHash(passwordEncoder.encode(educatorRequest.getPasswordHash()));
             user.setName(educatorRequest.getName());
             user.setDateBirth(educatorRequest.getDateBirth());
             user.setGender(educatorRequest.getGender());
             user.setDisability(educatorRequest.getDisability());
             user.setEducationLevel(educatorRequest.getEducationLevel());
             user.setInstituteName(educatorRequest.getInstituteName());
+            user.setCity(educatorRequest.getCity());
+            user.setState(educatorRequest.getState());
             userRepository.save(user);
 
             Educator educator = new Educator();
@@ -95,7 +104,7 @@ public class EducatorController {
 
                 user.setUserType(educatorRequest.getUserType());
                 user.setEmail(educatorRequest.getEmail());
-                user.setPasswordHash(educatorRequest.getPasswordHash());
+                user.setPasswordHash(passwordEncoder.encode(educatorRequest.getPasswordHash()));
                 user.setName(educatorRequest.getName());
                 user.setDateBirth(educatorRequest.getDateBirth());
                 user.setGender(educatorRequest.getGender());

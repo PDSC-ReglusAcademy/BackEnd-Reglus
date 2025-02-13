@@ -13,6 +13,7 @@ public class Student {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonManagedReference
     private User user;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -20,15 +21,14 @@ public class Student {
     @JsonManagedReference
     private SocialAspect socialAspect;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "health_id")
-    @JsonManagedReference
+    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true) // Adicionando orphanRemoval = true
     private HealthWellbeing healthWellbeing;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "hobbies_id")
     @JsonManagedReference
     private InterestHobby interestHobby;
+    
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "study_id")
@@ -42,12 +42,6 @@ public class Student {
 
     @Column(length = 500)
     private String finalObservations;
-
-    @Column(length = 50)
-    private String state;
-
-    @Column(length = 50)
-    private String city;
 
     // Getters and Setters
     public Long getStudentId() {
@@ -112,21 +106,5 @@ public class Student {
 
     public void setFinalObservations(String finalObservations) {
         this.finalObservations = finalObservations;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
     }
 }

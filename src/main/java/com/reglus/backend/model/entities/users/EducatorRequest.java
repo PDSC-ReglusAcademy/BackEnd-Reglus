@@ -16,6 +16,8 @@ public class EducatorRequest {
     private String instituteName;
     private String experienceYears;
     private String bio;
+    private String state;
+    private String city;
 
     public UserType getUserType() {
         return userType;
@@ -103,5 +105,21 @@ public class EducatorRequest {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

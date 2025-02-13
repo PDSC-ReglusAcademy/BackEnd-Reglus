@@ -24,13 +24,13 @@ public class HealthWellbeingController {
     @Autowired
     private HealthWellbeingRepository healthWellbeingRepository;
 
-    /*
-    @PostMapping
+    /*@PostMapping
     public ResponseEntity<?> createHealthWellbeing(@RequestBody HealthWellbeingRequest request) {
         try {
             Optional<Student> optionalStudent = studentRepository.findById(request.getStudentId());
+
             if (!optionalStudent.isPresent()) {
-                return new ResponseEntity<>("Student not found", HttpStatus.NOT_FOUND);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student not found");
             }
 
             Student student = optionalStudent.get();
@@ -41,53 +41,51 @@ public class HealthWellbeingController {
             healthWellbeing.setPhysicalActivity(request.getPhysicalActivity());
             healthWellbeing.setDietaryEvaluation(request.getDietaryEvaluation());
             healthWellbeing.setSleepHours(request.getSleepHours());
+
+            // Salva primeiro o HealthWellbeing
             healthWellbeingRepository.save(healthWellbeing);
 
-            // Atualizar o estudante com o novo healthWellbeing
+            // Atualiza o estudante com o novo relacionamento e salva no banco
             student.setHealthWellbeing(healthWellbeing);
-            studentRepository.save(student);  // Salva o estudante com a referência atualizada
+            studentRepository.save(student);
 
             return new ResponseEntity<>(healthWellbeing, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao criar registro: " + e.getMessage());
         }
-    }
-    */
+    }*/
 
     @GetMapping
     public ResponseEntity<List<HealthWellbeing>> getAllHealthWellbeing() {
         try {
             List<HealthWellbeing> healthWellbeings = healthWellbeingRepository.findAll();
-            if (healthWellbeings.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            return new ResponseEntity<>(healthWellbeings, HttpStatus.OK);
+            return healthWellbeings.isEmpty()
+                    ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                    : new ResponseEntity<>(healthWellbeings, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<HealthWellbeing> getHealthWellbeingById(@PathVariable("id") Long id) {
-        Optional<HealthWellbeing> healthWellbeingData = healthWellbeingRepository.findById(id);
-        return healthWellbeingData.map(healthWellbeing -> new ResponseEntity<>(healthWellbeing, HttpStatus.OK))
+        Optional<HealthWellbeing> healthWellbeing = healthWellbeingRepository.findById(id);
+        return healthWellbeing.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-
     @PutMapping("/{id}")
-    public ResponseEntity<HealthWellbeing> updateHealthWellbeing(@PathVariable("id") Long id, @RequestBody HealthWellbeing healthWellbeing) {
-        Optional<HealthWellbeing> healthWellbeingData = healthWellbeingRepository.findById(id);
+    public ResponseEntity<?> updateHealthWellbeing(@PathVariable("id") Long id, @RequestBody HealthWellbeing healthWellbeing) {
+        Optional<HealthWellbeing> existingHealthWellbeing = healthWellbeingRepository.findById(id);
 
-        if (healthWellbeingData.isPresent()) {
-            HealthWellbeing existingHealthWellbeing = healthWellbeingData.get();
-            existingHealthWellbeing.setHealthCondition(healthWellbeing.getHealthCondition());
-            existingHealthWellbeing.setPhysicalActivity(healthWellbeing.getPhysicalActivity());
-            existingHealthWellbeing.setDietaryEvaluation(healthWellbeing.getDietaryEvaluation());
-            existingHealthWellbeing.setSleepHours(healthWellbeing.getSleepHours());
+        if (existingHealthWellbeing.isPresent()) {
+            HealthWellbeing updatedHealthWellbeing = existingHealthWellbeing.get();
+            updatedHealthWellbeing.setHealthCondition(healthWellbeing.getHealthCondition());
+            updatedHealthWellbeing.setPhysicalActivity(healthWellbeing.getPhysicalActivity());
+            updatedHealthWellbeing.setDietaryEvaluation(healthWellbeing.getDietaryEvaluation());
+            updatedHealthWellbeing.setSleepHours(healthWellbeing.getSleepHours());
 
-            HealthWellbeing updatedHealthWellbeing = healthWellbeingRepository.save(existingHealthWellbeing);
-            return new ResponseEntity<>(updatedHealthWellbeing, HttpStatus.OK);
+            return new ResponseEntity<>(healthWellbeingRepository.save(updatedHealthWellbeing), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -96,18 +94,19 @@ public class HealthWellbeingController {
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteHealthWellbeing(@PathVariable("id") Long id) {
         try {
-            Optional<HealthWellbeing> healthWellbeingData = healthWellbeingRepository.findById(id);
+            Optional<HealthWellbeing> existingHealthWellbeing = healthWellbeingRepository.findById(id);
 
-            if (healthWellbeingData.isPresent()) {
-                HealthWellbeing healthWellbeing = healthWellbeingData.get();
+            if (existingHealthWellbeing.isPresent()) {
+                HealthWellbeing healthWellbeing = existingHealthWellbeing.get();
+
+                // Remove a referência do estudante antes de deletar
                 Student student = healthWellbeing.getStudent();
-
-                if(student != null){
+                if (student != null) {
                     student.setHealthWellbeing(null);
                     studentRepository.save(student);
                 }
-                healthWellbeingRepository.deleteById(id);
 
+                healthWellbeingRepository.deleteById(id);
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);

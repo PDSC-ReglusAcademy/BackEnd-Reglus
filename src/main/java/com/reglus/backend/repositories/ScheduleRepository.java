@@ -12,14 +12,17 @@ import java.util.List;
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
-    // Consulta para buscar agendamentos por data
+    // Consulta por dia
     List<Schedule> findByDate(LocalDate date);
 
-    // Consulta para buscar agendamentos por semana
-    @Query("SELECT s FROM Schedule s WHERE s.date BETWEEN :startDate AND :endDate")
-    List<Schedule> findByWeek(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    // Consulta por semana
+    List<Schedule> findByDateBetween(LocalDate startDate, LocalDate endDate);
 
-    // Consulta para buscar agendamentos por mês
+    // Consulta por mês
     @Query("SELECT s FROM Schedule s WHERE YEAR(s.date) = :year AND MONTH(s.date) = :month")
     List<Schedule> findByMonth(@Param("year") int year, @Param("month") int month);
+
+    // Consulta por ano
+    @Query("SELECT s FROM Schedule s WHERE YEAR(s.date) = :year")
+    List<Schedule> findByYear(@Param("year") int year);
 }

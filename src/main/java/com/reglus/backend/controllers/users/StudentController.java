@@ -1,9 +1,11 @@
 package com.reglus.backend.controllers.users;
 
+import com.reglus.backend.model.entities.schedule.Schedule;
 import com.reglus.backend.model.entities.users.Student;
 import com.reglus.backend.model.entities.users.User;
 import com.reglus.backend.model.entities.users.StudentRequest;
 import com.reglus.backend.model.entities.users.smf.*;
+import com.reglus.backend.repositories.ScheduleRepository;
 import com.reglus.backend.repositories.SocialAspectRepository;
 import com.reglus.backend.model.enums.UserType;
 import com.reglus.backend.repositories.StudentRepository;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +33,9 @@ public class StudentController {
     private SocialAspectRepository socialAspectRepository;
 
     @Autowired
+    private ScheduleRepository scheduleRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder; // Injeta o PasswordEncoder
 
     @PostMapping
@@ -38,19 +44,21 @@ public class StudentController {
             User user = new User();
             user.setUserType(UserType.STUDENT);
             user.setEmail(studentRequest.getEmail());
-            user.setPasswordHash(passwordEncoder.encode(studentRequest.getPasswordHash())); // Criptografa a senha
+            user.setPasswordHash(passwordEncoder.encode(studentRequest.getPasswordHash()));
             user.setName(studentRequest.getName());
             user.setDateBirth(studentRequest.getDateBirth());
             user.setGender(studentRequest.getGender());
             user.setDisability(studentRequest.getDisability());
             user.setEducationLevel(studentRequest.getEducationLevel());
             user.setInstituteName(studentRequest.getInstituteName());
+            user.setCity(studentRequest.getCity());
+            user.setState(studentRequest.getState());
             userRepository.save(user);
 
             Student student = new Student();
             student.setUser(user);
-            student.setState(studentRequest.getState());
-            student.setCity(studentRequest.getCity());
+            user.setState(studentRequest.getState());
+            user.setCity(studentRequest.getCity());
             student.setFinalObservations(studentRequest.getFinalObservations());
 
             SocialAspect socialAspect = new SocialAspect();
@@ -122,6 +130,68 @@ public class StudentController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateStudent(@PathVariable("id") Long id, @RequestBody StudentRequest studentRequest) {
+        try {
+            Optional<Student> studentData = studentRepository.findById(id);
+
+            if (studentData.isPresent()) {
+                Student student = studentData.get();
+                User user = student.getUser();
+
+                user.setEmail(studentRequest.getEmail());
+                user.setName(studentRequest.getName());
+                user.setDateBirth(studentRequest.getDateBirth());
+                user.setGender(studentRequest.getGender());
+                user.setDisability(studentRequest.getDisability());
+                user.setEducationLevel(studentRequest.getEducationLevel());
+                user.setInstituteName(studentRequest.getInstituteName());
+                user.setCity(studentRequest.getCity());
+                user.setState(studentRequest.getState());
+                userRepository.save(user);
+
+                student.setFinalObservations(studentRequest.getFinalObservations());
+
+                SocialAspect socialAspect = student.getSocialAspect();
+                socialAspect.setLivingWith(studentRequest.getSocialAspectRequest().getLivingWith());
+                socialAspect.setRelationshipWithClassmates(studentRequest.getSocialAspectRequest().getRelationshipWithClassmates());
+                socialAspect.setRelationshipWithTeachers(studentRequest.getSocialAspectRequest().getRelationshipWithTeachers());
+                socialAspect.setRelationshipWithFamily(studentRequest.getSocialAspectRequest().getRelationshipWithFamily());
+                socialAspectRepository.save(socialAspect);
+
+                StudyHabit studyHabit = student.getStudyHabit();
+                studyHabit.setStudyMethods(studentRequest.getStudyHabitRequest().getStudyMethods());
+                studyHabit.setStudyHoursPerDay(studentRequest.getStudyHabitRequest().getStudyHoursPerDay());
+                studyHabit.setStudyLocations(studentRequest.getStudyHabitRequest().getStudyLocations());
+                studyHabit.setStudyPlan(studentRequest.getStudyHabitRequest().getStudyPlan());
+
+                HealthWellbeing healthWellbeing = student.getHealthWellbeing();
+                healthWellbeing.setHealthCondition(studentRequest.getHealthWellbeingRequest().getHealthCondition());
+                healthWellbeing.setPhysicalActivity(studentRequest.getHealthWellbeingRequest().getPhysicalActivity());
+                healthWellbeing.setDietaryEvaluation(studentRequest.getHealthWellbeingRequest().getDietaryEvaluation());
+                healthWellbeing.setSleepHours(studentRequest.getHealthWellbeingRequest().getSleepHours());
+
+                InterestHobby interestHobby = student.getInterestHobby();
+                interestHobby.setActivitiesOutsideSchool(studentRequest.getInterestHobbyRequest().getActivitiesOutsideSchool());
+                interestHobby.setDreamsGoals(studentRequest.getInterestHobbyRequest().getDreamsGoals());
+
+                SelfAssessment selfAssessment = student.getSelfAssessment();
+                selfAssessment.setPerformanceEvaluation(studentRequest.getSelfAssessmentRequest().getPerformanceEvaluation());
+                selfAssessment.setStrengths(studentRequest.getSelfAssessmentRequest().getStrengths());
+                selfAssessment.setImprovementAreas(studentRequest.getSelfAssessmentRequest().getImprovementAreas());
+
+                studentRepository.save(student);
+
+                return new ResponseEntity<>(student, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Student not found with id: " + id, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteStudent(@PathVariable("id") Long id) {
         try {
@@ -139,6 +209,7 @@ public class StudentController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
+            e.printStackTrace(); // Log da exceção
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

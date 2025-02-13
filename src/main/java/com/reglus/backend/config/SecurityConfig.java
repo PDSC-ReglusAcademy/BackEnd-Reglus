@@ -2,6 +2,7 @@ package com.reglus.backend.config;
 import com.reglus.backend.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,12 +30,15 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Desativa CSRF para APIs baseadas em JWT
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Permite acesso público aos endpoints de autenticação
-                        .requestMatchers("/api/students").permitAll() // Permite acesso público ao endpoint de criação de estudante
-                        .anyRequest().authenticated()               // Exige autenticação para todos os outros endpoints
+                        .requestMatchers("/api/auth/**").permitAll() // Permite acesso público ao login
+                        .requestMatchers("/api/students").permitAll() // Permite criar estudantes
+                        .requestMatchers( "/api/educators").permitAll() // Permite criar educadores
+                        .anyRequest().authenticated() // Requer autenticação para outras requisições
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Adiciona o filtro JWT
 
+
         return http.build();
     }
+
 }
