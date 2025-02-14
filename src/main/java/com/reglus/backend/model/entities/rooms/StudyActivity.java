@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import com.reglus.backend.model.entities.users.Student;
 import com.reglus.backend.model.entities.rooms.Room;
 
+//Registra sessões de estudo de um estudante
+//Ligada a um estudante e uma sala
 @Entity
 @Table(name = "study_activities")
 public class StudyActivity {

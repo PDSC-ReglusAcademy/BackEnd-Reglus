@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import com.reglus.backend.model.entities.rooms.Room;
 import com.reglus.backend.model.entities.users.Educator;
 
+//Representa atividades criadas por educadores
+//Ligada a um educador, sala e cronograma
 @Entity
 @Table(name = "activities")
 public class Activity {

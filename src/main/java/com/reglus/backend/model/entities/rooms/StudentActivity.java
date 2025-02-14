@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 
 import com.reglus.backend.model.entities.rooms.Activity;
 import com.reglus.backend.model.entities.users.Student;
-
+//Representa a submissão de uma atividade feita por um estudante
+//Ligada a uma atividade e a um estudante
 @Entity
 @Table(name = "student_activities")
 public class StudentActivity {
