@@ -4,10 +4,7 @@ import com.reglus.backend.model.entities.rooms.Activity;
 import com.reglus.backend.model.entities.rooms.Room;
 import com.reglus.backend.model.entities.schedule.Schedule;
 import com.reglus.backend.model.entities.users.Educator;
-import com.reglus.backend.repositories.ActivityRepository;
-import com.reglus.backend.repositories.RoomRepository; //Repositorio da classe entidy Room ainda não implementado
-import com.reglus.backend.repositories.ScheduleRepository;
-import com.reglus.backend.repositories.UserRepository;
+import com.reglus.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,13 +32,38 @@ public class ActivityController {
     @Autowired
     private ScheduleRepository scheduleRepository;
 
+    @Autowired
+    private EducatorRepository educatorRepository;
+
     // Criar uma nova atividade
     @PostMapping
     public ResponseEntity<?> createActivity(@RequestBody Activity activity) {
         try {
-            activity.setCreatedAt(LocalDateTime.now());
-            activity.setUpdatedAt(LocalDateTime.now());
+            // Verifica se o Educator foi informado corretamente
+            if (activity.getEducator() == null || activity.getEducator().getEducatorId() == null) {
+                return new ResponseEntity<>("O Educator deve ter um ID válido", HttpStatus.BAD_REQUEST);
+            }
 
+            // Busca o Educator pelo ID no banco de dados
+            Optional<Educator> educatorOptional = educatorRepository.findById(activity.getEducator().getEducatorId());
+            if (educatorOptional.isEmpty()) {
+                return new ResponseEntity<>("Educator não encontrado", HttpStatus.NOT_FOUND);
+            }
+            activity.setEducator(educatorOptional.get());
+
+            // Verifica se o Schedule já existe antes de associá-lo à Activity
+            if (activity.getSchedule() != null && activity.getSchedule().getId() != null) {
+                Optional<Schedule> scheduleOptional = scheduleRepository.findById(activity.getSchedule().getId());
+                if (scheduleOptional.isEmpty()) {
+                    return new ResponseEntity<>("Schedule não encontrado", HttpStatus.NOT_FOUND);
+                }
+                activity.setSchedule(scheduleOptional.get());
+            } else {
+                return new ResponseEntity<>("Schedule deve ter um ID válido", HttpStatus.BAD_REQUEST);
+            }
+
+
+            // Salva a Activity
             Activity savedActivity = activityRepository.save(activity);
             return new ResponseEntity<>(savedActivity, HttpStatus.CREATED);
         } catch (Exception e) {
@@ -58,11 +80,12 @@ public class ActivityController {
 
     // Obter uma atividade por ID
     @GetMapping("/{id}")
-    public ResponseEntity<?> getActivityById(@PathVariable Long id) {
+    public ResponseEntity<Object> getActivityById(@PathVariable Long id) {
         Optional<Activity> activity = activityRepository.findById(id);
-        return activity.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>("Atividade não encontrada", HttpStatus.NOT_FOUND));
+        return activity.map(value -> new ResponseEntity<Object>(value, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<Object>("Atividade não encontrada", HttpStatus.NOT_FOUND));
     }
+
 
     // Atualizar uma atividade
     @PutMapping("/{id}")
@@ -107,12 +130,11 @@ public class ActivityController {
     }
 
     // Obter atividades por educador (Educator)
-    //Tem que revisar por que está incoerente com a classe
     @GetMapping("/educator/{educatorId}")
     public ResponseEntity<List<Activity>> getActivitiesByEducator(@PathVariable Long educatorId) {
-        Optional<Educator> educator = userRepository.findById(educatorId).map(user -> (Educator) user);
-        return educator.map(value -> new ResponseEntity<>(activityRepository.findByEducator(value), HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        Optional<Educator> educator = educatorRepository.findById(educatorId);
+        return educator.map(value -> new ResponseEntity<List<Activity>>(activityRepository.findByEducator(value), HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<List<Activity>>(HttpStatus.NOT_FOUND));
     }
 
     // Obter atividades por cronograma (Schedule)

@@ -3,12 +3,10 @@ package com.reglus.backend.model.entities.rooms;
 import com.reglus.backend.model.entities.schedule.Schedule;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-
-import com.reglus.backend.model.entities.rooms.Room;
 import com.reglus.backend.model.entities.users.Educator;
 
-//Representa atividades criadas por educadores
-//Ligada a um educador, sala e cronograma
+// Representa atividades criadas por educadores
+// Ligada a um educador, sala e cronograma
 @Entity
 @Table(name = "activities")
 public class Activity {
@@ -44,8 +42,19 @@ public class Activity {
     @JoinColumn(name = "schedule_id", nullable = false)
     private Schedule schedule;
 
-    // Getters and Setters
+    // Método para definir automaticamente as datas antes de salvar
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
 
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    // Getters and Setters
     public Schedule getSchedule() {
         return schedule;
     }
@@ -117,6 +126,4 @@ public class Activity {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-
 }
