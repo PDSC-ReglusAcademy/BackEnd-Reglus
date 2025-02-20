@@ -15,12 +15,12 @@ public class Room {
     private Long roomId;
 
     @ManyToOne
-    @JoinColumn(name = "course_id", nullable = false)
-    private Course course;
-
-    @ManyToOne
     @JoinColumn(name = "educator_id", nullable = false)
     private Educator educator;
+
+    @ManyToOne
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -40,7 +40,7 @@ public class Room {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    // Getters and Setters
+    // Getters e Setters
     public Long getRoomId() {
         return roomId;
     }
@@ -49,20 +49,20 @@ public class Room {
         this.roomId = roomId;
     }
 
-    public Course getCourse() {
-        return course;
-    }
-
-    public void setCourse(Course course) {
-        this.course = course;
-    }
-
     public Educator getEducator() {
         return educator;
     }
 
     public void setEducator(Educator educator) {
         this.educator = educator;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
     }
 
     public String getName() {

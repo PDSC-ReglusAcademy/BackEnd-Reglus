@@ -13,15 +13,13 @@ public class Student {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonManagedReference
     private User user;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "social_id")
-    @JsonManagedReference
     private SocialAspect socialAspect;
 
-    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true) // Adicionando orphanRemoval = true
+    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private HealthWellbeing healthWellbeing;
 
     @OneToOne(cascade = CascadeType.ALL)
