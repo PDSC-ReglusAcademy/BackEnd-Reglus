@@ -30,7 +30,6 @@ public class StudyActivityController {
     private StudentRepository studentRepository;
 
 
-    //Repositorio da classe entidy Room ainda não implementado
     @Autowired
     private RoomRepository roomRepository;
 

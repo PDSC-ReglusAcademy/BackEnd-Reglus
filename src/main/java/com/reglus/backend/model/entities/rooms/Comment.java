@@ -9,7 +9,8 @@ public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "comment_id")
+    private Long commentId;
 
     @ManyToOne
     @JoinColumn(name = "room_id", nullable = false)
@@ -40,7 +41,7 @@ public class Comment {
     }
 
     // Getters e Setters
-    public Long getId() { return id; }
+    public Long getId() { return commentId; }
     public Room getRoom() { return room; }
     public Student getStudent() { return student; }
     public String getContent() { return content; }
@@ -54,4 +55,7 @@ public class Comment {
     public void setPublic(boolean isPublic) { this.isPublic = isPublic; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public void setId(Long id) {
+        this.commentId = id;
+    }
 }

@@ -122,20 +122,20 @@ public class RoomContentController {
                     if (content.getType().equals("text") || content.getType().equals("link")) {
                         // Retorna apenas os campos relevantes para text e link
                         return Map.of(
-                                "id", content.getId(),
-                                "type", content.getType(),
-                                "content", content.getContent(),
-                                "createdAt", content.getCreatedAt(),
-                                "updatedAt", content.getUpdatedAt()
+                                "id", content.getId() != null ? content.getId() : 0L, // Evita null
+                                "type", content.getType() != null ? content.getType() : "", // Evita null
+                                "content", content.getContent() != null ? content.getContent() : "", // Evita null
+                                "createdAt", content.getCreatedAt() != null ? content.getCreatedAt() : LocalDateTime.now(), // Evita null
+                                "updatedAt", content.getUpdatedAt() != null ? content.getUpdatedAt() : LocalDateTime.now() // Evita null
                         );
                     } else if (content.getType().equals("image") || content.getType().equals("video")) {
                         // Retorna um link para exibir o arquivo
                         return Map.of(
-                                "id", content.getId(),
-                                "type", content.getType(),
+                                "id", content.getId() != null ? content.getId() : 0L, // Evita null
+                                "type", content.getType() != null ? content.getType() : "", // Evita null
                                 "displayUrl", "/api/rooms/" + roomId + "/contents/" + content.getId() + "/display",
-                                "createdAt", content.getCreatedAt(),
-                                "updatedAt", content.getUpdatedAt()
+                                "createdAt", content.getCreatedAt() != null ? content.getCreatedAt() : LocalDateTime.now(), // Evita null
+                                "updatedAt", content.getUpdatedAt() != null ? content.getUpdatedAt() : LocalDateTime.now() // Evita null
                         );
                     }
                     return null; // Nunca deve acontecer, pois os tipos são validados no POST

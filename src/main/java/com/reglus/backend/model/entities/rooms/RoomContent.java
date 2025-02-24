@@ -11,7 +11,7 @@ public class RoomContent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "content_id")
+    @Column(name = "room_content_id")
     private Long id;
 
     @ManyToOne

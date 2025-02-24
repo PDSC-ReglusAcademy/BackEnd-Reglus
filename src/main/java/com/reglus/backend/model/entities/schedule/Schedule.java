@@ -12,7 +12,8 @@ import java.util.Set;
 public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "schedules_id")
+    private Long schedulesId;
 
     @Column(nullable = false)
     private String title;
@@ -62,11 +63,11 @@ public class Schedule {
 
     // Getters e Setters
     public Long getId() {
-        return id;
+        return schedulesId;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.schedulesId = id;
     }
 
     public String getTitle() {
