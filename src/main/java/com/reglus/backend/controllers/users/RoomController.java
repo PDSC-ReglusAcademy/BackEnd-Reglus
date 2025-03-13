@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +48,13 @@ public class RoomController {
         Optional<Room> room = roomRepository.findById(id);
         return room.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    // Buscar salas por educador
+    @GetMapping("/educator/{educatorId}")
+    public ResponseEntity<List<Room>> getRoomsByEducator(@PathVariable Long educatorId) {
+        List<Room> rooms = roomRepository.findByEducator_EducatorId(educatorId);
+        return new ResponseEntity<>(rooms, HttpStatus.OK);
     }
 
     // Obter todos os estudantes de uma sala
