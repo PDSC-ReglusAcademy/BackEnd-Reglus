@@ -18,7 +18,7 @@ public class Room {
     @JoinColumn(name = "educator_id", nullable = false)
     private Educator educator;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL) // Persistir o Course em cascata
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
@@ -31,7 +31,7 @@ public class Room {
     @Column(name = "start_date", nullable = false)
     private LocalDateTime startDate;
 
-    @Column(name = "end_date", nullable = false)
+    @Column(nullable = true) // Permite valores nulos
     private LocalDateTime endDate;
 
     @Column(name = "created_at", nullable = false, updatable = false)
