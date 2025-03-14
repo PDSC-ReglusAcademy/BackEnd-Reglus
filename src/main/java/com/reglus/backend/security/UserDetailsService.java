@@ -2,6 +2,7 @@ package com.reglus.backend.security;
 
 import com.reglus.backend.model.entities.users.User;
 import com.reglus.backend.repositories.UserRepository;
+import com.reglus.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

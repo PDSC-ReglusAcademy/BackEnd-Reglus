@@ -4,6 +4,8 @@ import com.reglus.backend.model.entities.users.User;
 import com.reglus.backend.model.entities.users.login.LoginRequest;
 import com.reglus.backend.repositories.UserRepository;
 import com.reglus.backend.security.JwtUtil;
+import com.reglus.backend.security.TokenBlacklistService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,10 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil; // Utilitário JWT injetado
+
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
+
 
     /**
      * Endpoint para login do usuário.
@@ -55,5 +61,18 @@ public class AuthController {
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não encontrado.");
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            tokenBlacklistService.addToBlacklist(token);
+            return ResponseEntity.ok("Logout realizado com sucesso.");
+        }
+
+        return ResponseEntity.badRequest().body("Token inválido ou ausente.");
     }
 }
